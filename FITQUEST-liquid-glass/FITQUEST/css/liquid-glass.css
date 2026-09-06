@@ -1,0 +1,192 @@
+/* ==========================================================================
+   FITQUEST — Lớp giao diện "Liquid Glass"
+   File này được nạp SAU cùng ở mọi trang, đóng vai trò một lớp phủ (skin)
+   biến các mảng nền đặc thành mặt kính mờ, trong suốt, có khúc xạ ánh sáng.
+   Không đụng tới HTML hay các file CSS gốc — chỉ cần xoá dòng <link> là
+   quay lại giao diện cũ.
+   ========================================================================== */
+
+:root{
+  --glass-blur: 22px;
+  --glass-blur-sm: 12px;
+  --glass-border: rgba(255,255,255,.55);
+  --glass-border-soft: rgba(255,255,255,.35);
+  --glass-shadow: 0 10px 34px rgba(24,43,71,.14);
+  --glass-shadow-lg: 0 18px 46px rgba(24,43,71,.18);
+  --glass-highlight: inset 0 1px 0 rgba(255,255,255,.75), inset 0 0 24px rgba(255,255,255,.06);
+}
+
+/* ---- 1. Nền loang màu phía sau toàn trang -------------------------------
+   Kính cần "khúc xạ" một thứ gì đó phía sau nó mới thấy hiệu ứng, nên thay
+   nền phẳng bằng các quầng màu mềm, cố định khi cuộn (fixed). */
+html{
+  min-height:100%;
+  background:
+    radial-gradient(circle at 10% 8%,  #cfe0ff 0%, transparent 42%),
+    radial-gradient(circle at 92% 14%, #ffd9de 0%, transparent 40%),
+    radial-gradient(circle at 14% 92%, #cdf3e1 0%, transparent 42%),
+    radial-gradient(circle at 90% 88%, #e6d8ff 0%, transparent 44%),
+    #eef2f9;
+  background-attachment: fixed;
+}
+body{ background: transparent !important; }
+
+/* Quầng sáng trôi nhẹ phía sau nội dung, tạo cảm giác "chất lỏng" chuyển động */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-10% -10% auto auto;
+  width:60vmax;
+  height:60vmax;
+  background:radial-gradient(circle, rgba(120,160,255,.25), transparent 65%);
+  filter:blur(40px);
+  z-index:-1;
+  animation: lg-float 22s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto auto -15% -10%;
+  width:55vmax;
+  height:55vmax;
+  background:radial-gradient(circle, rgba(160,120,255,.22), transparent 65%);
+  filter:blur(40px);
+  z-index:-1;
+  animation: lg-float 26s ease-in-out infinite alternate-reverse;
+  pointer-events:none;
+}
+@keyframes lg-float{
+  from{ transform:translate(0,0) scale(1); }
+  to{ transform:translate(-6%,6%) scale(1.08); }
+}
+
+/* ---- 2. Khối kính dùng chung --------------------------------------------- */
+.header,
+.card,
+.chart-card,
+.exercise-card,
+.intro-card,
+.welcome,
+.achievement,
+.module-entry a,
+.bottom-nav,
+#design-panel{
+  background: rgba(255,255,255,.44) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow), var(--glass-highlight) !important;
+}
+
+/* intro-card vốn có gradient màu riêng theo từng trang: giữ sắc thái đó,
+   chỉ phủ thêm lớp mờ để vẫn đồng bộ hiệu ứng */
+.intro-card{ background-blend-mode: overlay; }
+
+/* header chỉ có viền dưới, không phải viền 4 cạnh */
+.header{
+  border: 0 !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+.bottom-nav{
+  border: 0 !important;
+  border-top: 1px solid var(--glass-border) !important;
+  border-radius: 22px 22px 0 0;
+}
+#design-panel{
+  border: 0 !important;
+  border-left: 1px solid var(--glass-border) !important;
+}
+
+/* ---- 3. Chip / badge / nhãn nhỏ ------------------------------------------ */
+.chip,
+.avatar,
+.demo-label,
+.badge,
+.period,
+.pill,
+.art-tag,
+.week-dots span{
+  background: rgba(255,255,255,.55) !important;
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(160%);
+  border: 1px solid var(--glass-border-soft);
+}
+
+/* huy hiệu màu (streak/trophies/xp, green/blue-badge…) giữ sắc thái gốc,
+   chỉ cần trong hơn một chút để hợp với nền kính */
+.streak, .trophies, .xp{ background-blend-mode: overlay; }
+
+/* ---- 4. Vòng tiến độ & thanh progress ------------------------------------ */
+.progress-ring>div{
+  background: rgba(255,255,255,.62) !important;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+progress{ background: rgba(255,255,255,.4) !important; }
+
+/* ---- 5. Nút bấm: hiệu ứng ánh sáng chảy khi hover/focus ------------------ */
+.primary,
+.nav-item,
+#design-toggle,
+#ed-save{
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.primary::before,
+#design-toggle::before,
+#ed-save::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(120deg,
+    transparent 20%,
+    rgba(255,255,255,.4) 45%,
+    rgba(255,255,255,.05) 58%,
+    transparent 80%);
+  transform: translateX(-70%);
+  transition: transform .6s ease;
+  pointer-events:none;
+}
+.primary:hover::before,
+.primary:focus-visible::before,
+#design-toggle:hover::before,
+#ed-save:hover::before{
+  transform: translateX(70%);
+}
+
+.nav-item.active{
+  background: rgba(255,255,255,.6) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 11px;
+}
+
+/* ---- 6. Toast: kính tối, dùng cho nền chữ sáng --------------------------- */
+.toast{
+  background: rgba(24,43,71,.62) !important;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow: var(--glass-shadow-lg) !important;
+}
+
+/* ---- 7. Điều chỉnh riêng theo trang (giữ đúng tông màu thương hiệu) ------ */
+.strength-entry a{ background: rgba(255,240,241,.5) !important; }
+.resistance-entry a{ background: rgba(241,234,255,.5) !important; }
+
+/* ---- 8. Khả năng tiếp cận ------------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  body::before, body::after{ animation: none; }
+  .primary::before, #design-toggle::before, #ed-save::before{ transition: none; }
+}
+
+/* Safari/trình duyệt cũ không hỗ trợ backdrop-filter: rơi về nền mờ đặc hơn
+   một chút để nội dung vẫn đọc được rõ ràng. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .header, .card, .chart-card, .exercise-card, .intro-card, .welcome,
+  .achievement, .module-entry a, .bottom-nav, #design-panel{
+    background: rgba(255,255,255,.86) !important;
+  }
+}
